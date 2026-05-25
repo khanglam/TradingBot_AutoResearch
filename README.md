@@ -1,7 +1,12 @@
 # Project: TradingBot v2 — Autoresearch for Trading Strategies
-
 Build a clean, minimal, production-minded autoresearch system from scratch.
 Do NOT port the old codebase line-by-line. Preserve the *intent* below.
+
+## Canonical reference: karpathy/autoresearch
+Study and mirror the *structure and discipline* of https://github.com/karpathy/autoresearch
+— not the ML domain. Karpathy’s repo is the template for how autonomous research
+should feel: tiny surface area, one mutable file, fixed evaluator, human edits
+only `program.md`.
 
 ## North star
 
