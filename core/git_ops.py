@@ -54,7 +54,8 @@ def commit_all(cwd: Path, message: str, *,
         _run(["add", "-A"], cwd, env=full_env)
     proc = _run(["commit", "-m", message], cwd, env=full_env, check=False)
     if proc.returncode != 0:
-        if "nothing to commit" in (proc.stdout + proc.stderr):
+        combined = proc.stdout + proc.stderr
+        if "nothing to commit" in combined or "nothing added to commit" in combined:
             return ""
         raise GitError(f"git commit failed: {proc.stderr}")
     return _run(["rev-parse", "HEAD"], cwd).stdout.strip()
