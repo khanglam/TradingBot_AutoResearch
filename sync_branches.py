@@ -42,9 +42,25 @@ def worktree_path(campaign: str, base: Path = REPO_ROOT) -> Path:
     return base.parent / f"{base.name}-worktrees" / campaign
 
 
+_SYNC_PROTECTED = {"strategies/{campaign}.py", "results_{campaign}.tsv"}
+
+
+def _worktree_tracked_files(wt: Path) -> list[str]:
+    import subprocess
+    result = subprocess.run(
+        ["git", "ls-files"], cwd=str(wt), capture_output=True, text=True, check=True
+    )
+    return result.stdout.splitlines()
+
+
+def _is_protected(rel: str, campaign: str) -> bool:
+    return rel in {f"strategies/{campaign}.py", f"results_{campaign}.tsv"}
+
+
 def sync_harness(campaign: str, *, dry_run: bool = False,
                  base: Path = REPO_ROOT) -> dict:
-    """Copy allowlisted files from main repo to campaign worktree, commit."""
+    """Copy allowlisted files from main repo to campaign worktree and delete
+    any tracked files that were removed from main, then commit."""
     wt = worktree_path(campaign, base)
     if not wt.exists():
         raise FileNotFoundError(f"worktree missing: {wt}. Run init script first.")
@@ -62,15 +78,25 @@ def sync_harness(campaign: str, *, dry_run: bool = False,
         shutil.copy2(src, dst)
         copied.append(rel)
 
+    deleted = []
+    for rel in _worktree_tracked_files(wt):
+        if _is_protected(rel, campaign):
+            continue
+        if (base / rel).exists():
+            continue
+        deleted.append(rel)
+        if not dry_run:
+            (wt / rel).unlink(missing_ok=True)
+
     sha = short_sha(base)
-    if not dry_run and copied:
+    if not dry_run and (copied or deleted):
         commit_all(
             wt, f"sync harness from main @ {sha}",
             author_name="sync-bot", author_email="sync@autoresearch.local",
-            paths=copied,
+            paths=copied + deleted,
         )
-    return {"campaign": campaign, "copied": copied, "from_sha": sha,
-            "dry_run": dry_run}
+    return {"campaign": campaign, "copied": copied, "deleted": deleted,
+            "from_sha": sha, "dry_run": dry_run}
 
 
 def _frozen_marker_path(campaign: str, base: Path = REPO_ROOT) -> Path:
