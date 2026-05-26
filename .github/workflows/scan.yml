@@ -1,0 +1,25 @@
+name: scan
+
+on:
+  schedule:
+    - cron: "0 13 * * 1-5"     # stocks pre-open (UTC)
+    - cron: "0 21 * * 1-5"     # stocks at close
+    - cron: "5 */2 * * *"      # crypto every 2h
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        campaign: [crypto, stocks]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt
+      - name: Scan
+        env:
+          WEBHOOK_URL:  ${{ secrets.WEBHOOK_URL }}
+          WEBHOOK_KIND: ${{ vars.WEBHOOK_KIND || 'discord' }}
+        run: python scan.py --campaign ${{ matrix.campaign }}

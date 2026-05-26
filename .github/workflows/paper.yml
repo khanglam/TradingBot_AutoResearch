@@ -1,0 +1,23 @@
+name: paper-trade
+
+# Phase 2 — disabled by default. Manual trigger only.
+on:
+  workflow_dispatch:
+
+jobs:
+  paper:
+    if: false   # gated until Phase 2 wiring is reviewed
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        campaign: [crypto, stocks]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt
+      - env:
+          ALPACA_API_KEY:    ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+          ALPACA_PAPER:      "true"
+        run: python live_trade.py --campaign ${{ matrix.campaign }}

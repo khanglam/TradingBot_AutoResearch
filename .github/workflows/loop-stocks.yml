@@ -1,0 +1,21 @@
+name: loop-stocks
+
+on:
+  schedule:
+    - cron: "30 21 * * 1-5"   # weekdays after US close (UTC)
+  workflow_dispatch:
+    inputs:
+      iters:
+        description: "Iterations"
+        default: "20"
+        required: false
+
+jobs:
+  loop:
+    uses: ./.github/workflows/_reusable_loop.yml
+    with:
+      campaign: stocks
+      iters: ${{ inputs.iters || '20' }}
+    secrets:
+      OPENROUTER_API_KEY:        ${{ secrets.OPENROUTER_API_KEY }}
+      AUTORESEARCH_PUSH_TOKEN:   ${{ secrets.AUTORESEARCH_PUSH_TOKEN }}

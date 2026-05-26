@@ -1,0 +1,46 @@
+name: sync-branches
+
+on:
+  schedule:
+    - cron: "0 8 * * *"   # daily 08:00 UTC
+  workflow_dispatch:
+
+jobs:
+  sync-and-promote:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        campaign: [crypto, stocks]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.AUTORESEARCH_PUSH_TOKEN }}
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt
+      - name: Configure git
+        run: |
+          git config user.name  "sync-bot"
+          git config user.email "sync@autoresearch.local"
+      - name: Add campaign worktree
+        run: |
+          BRANCH="autoresearch/${{ matrix.campaign }}"
+          git fetch origin "$BRANCH" || git branch "$BRANCH" main
+          git worktree add ../wt-${{ matrix.campaign }} "$BRANCH"
+      - name: Sync harness
+        run: python sync_branches.py --mode sync-harness --campaign ${{ matrix.campaign }}
+      - name: Push campaign branch
+        run: |
+          cd ../wt-${{ matrix.campaign }}
+          git push origin HEAD
+        continue-on-error: true
+      - name: Promote (dry-run if nothing kept yet)
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: python sync_branches.py --mode promote --campaign ${{ matrix.campaign }}
+      - name: Push main
+        run: git push origin main
+        continue-on-error: true

@@ -1,0 +1,15 @@
+Try widening the ATR stop slightly to reduce premature exits during volatility spikes.
+
+```diff
+--- a/strategies/crypto.py
++++ b/strategies/crypto.py
+@@ -33,7 +33,7 @@ class Strategy(_BaseStrategy):
+     donchian_n = 20
+     exit_n = 10
+     atr_n = 14
+-    atr_stop = 2.0
++    atr_stop = 2.5
+     risk_frac = 0.5
+
+     def init(self):
+```

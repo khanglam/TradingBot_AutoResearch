@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/api.ts","./src/main.tsx","./src/components/campaignselector.tsx","./src/components/controls.tsx","./src/components/equitycurve.tsx","./src/components/frozenpanel.tsx","./src/components/liveconsole.tsx","./src/components/resultstable.tsx"],"version":"5.9.3"}

@@ -1,0 +1,59 @@
+name: reusable-loop
+
+on:
+  workflow_call:
+    inputs:
+      campaign: { required: true, type: string }
+      iters:    { required: false, type: string, default: "20" }
+    secrets:
+      OPENROUTER_API_KEY: { required: true }
+      AUTORESEARCH_PUSH_TOKEN: { required: true }
+
+jobs:
+  loop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.AUTORESEARCH_PUSH_TOKEN }}
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt
+      - name: Configure git
+        run: |
+          git config user.name  "loop-bot"
+          git config user.email "loop@autoresearch.local"
+      - name: Checkout campaign branch (create from origin if local missing)
+        run: |
+          BRANCH="autoresearch/${{ inputs.campaign }}"
+          if git show-ref --verify --quiet "refs/remotes/origin/$BRANCH"; then
+            git fetch origin "$BRANCH":"$BRANCH" || true
+            git checkout "$BRANCH"
+          else
+            git checkout -b "$BRANCH"
+          fi
+      - name: Sync harness from main
+        run: |
+          git fetch origin main
+          python sync_branches.py --mode sync-harness --campaign ${{ inputs.campaign }}
+        continue-on-error: true
+      - name: Run loop
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          CAMPAIGN: ${{ inputs.campaign }}
+        run: python loop.py --campaign ${{ inputs.campaign }} --iters ${{ inputs.iters }}
+      - name: Push campaign branch
+        run: |
+          BRANCH="autoresearch/${{ inputs.campaign }}"
+          git push origin "$BRANCH"
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: loop-${{ inputs.campaign }}-${{ github.run_id }}
+          path: |
+            logs/loop_${{ inputs.campaign }}.jsonl
+            results_${{ inputs.campaign }}.tsv
+            equity/*.json
+          if-no-files-found: ignore

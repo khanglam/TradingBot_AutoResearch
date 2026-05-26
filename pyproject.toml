@@ -1,0 +1,15 @@
+[project]
+name = "tradingbot-autoresearch"
+version = "0.1.0"
+description = "Autoresearch system for trading strategies"
+requires-python = ">=3.11,<3.13"
+readme = "README.md"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra --strict-markers"
+markers = [
+  "slow: marks slow tests",
+  "network: requires network access",
+]

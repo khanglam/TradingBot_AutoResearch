@@ -1,0 +1,39 @@
+# TradingBot v2 — configs.toml
+# Single source of truth on `main`. Loop reads (never writes) from campaign worktrees.
+# Env vars override exactly one field: OPTIMIZE_METRIC -> optimize_metric.
+
+[crypto]
+symbols              = ["BTC/USDT", "ETH/USDT"]
+exchange             = "binance"
+asset                = "crypto"
+timeframe            = "4h"
+strategy_path        = "strategies/crypto.py"
+data_fetch_start     = "2019-01-01"
+commission           = 0.001
+slippage             = 0.0005
+min_trades           = 30
+max_drawdown_limit   = 0.35
+basket_std_penalty   = 0.5
+lockbox_months       = 12
+val_months           = 18
+optimize_metric      = "sharpe"
+promotion_floor_lockbox_sharpe     = 0.0
+promotion_floor_lockbox_min_trades = 10
+
+[stocks]
+symbols              = ["SPY", "QQQ"]
+exchange             = ""
+asset                = "stocks"
+timeframe            = "1d"
+strategy_path        = "strategies/stocks.py"
+data_fetch_start     = "2005-01-01"
+commission           = 0.0005
+slippage             = 0.0002
+min_trades           = 20
+max_drawdown_limit   = 0.30
+basket_std_penalty   = 0.5
+lockbox_months       = 12
+val_months           = 18
+optimize_metric      = "sharpe"
+promotion_floor_lockbox_sharpe     = 0.0
+promotion_floor_lockbox_min_trades = 10

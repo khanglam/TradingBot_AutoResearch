@@ -1,0 +1,21 @@
+name: loop-crypto
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # every 6h
+  workflow_dispatch:
+    inputs:
+      iters:
+        description: "Iterations"
+        default: "20"
+        required: false
+
+jobs:
+  loop:
+    uses: ./.github/workflows/_reusable_loop.yml
+    with:
+      campaign: crypto
+      iters: ${{ inputs.iters || '20' }}
+    secrets:
+      OPENROUTER_API_KEY:        ${{ secrets.OPENROUTER_API_KEY }}
+      AUTORESEARCH_PUSH_TOKEN:   ${{ secrets.AUTORESEARCH_PUSH_TOKEN }}

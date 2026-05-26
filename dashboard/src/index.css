@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root { height: 100%; }
+  body {
+    background: radial-gradient(ellipse at top, #15151a 0%, #0a0a0b 60%);
+  }
+}
+
+@layer components {
+  .panel {
+    @apply bg-panel border border-border rounded-xl shadow-lg;
+  }
+  .btn {
+    @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium
+           border border-border bg-panel hover:bg-border transition-colors
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply bg-accent border-accent text-white hover:opacity-90;
+  }
+  .btn-danger {
+    @apply bg-bad border-bad text-white hover:opacity-90;
+  }
+  .chip {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+           border border-border bg-bg;
+  }
+  .input {
+    @apply bg-bg border border-border rounded-md px-2 py-1 text-sm w-20
+           focus:outline-none focus:ring-1 focus:ring-accent;
+  }
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2a30; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3a42; }
