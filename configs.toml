@@ -3,8 +3,8 @@
 # Env vars override exactly one field: OPTIMIZE_METRIC -> optimize_metric.
 
 [crypto]
-symbols              = ["BTC/USDT", "ETH/USDT"]
-exchange             = "binance"
+symbols              = ["BTC/USD", "ETH/USD"]
+exchange             = "kraken"
 asset                = "crypto"
 timeframe            = "4h"
 strategy_path        = "strategies/crypto.py"
