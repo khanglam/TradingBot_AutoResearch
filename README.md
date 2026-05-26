@@ -235,19 +235,18 @@ LLM must declare which category in its diff header comment, e.g.
 ## Quick start
 
 ```bash
-# 1. Copy env and set your OpenRouter key
+# 1. Set your OpenRouter key
 cp .env.example .env
 $EDITOR .env   # set OPENROUTER_API_KEY=...
 
-# 2. Bootstrap (creates venv, installs deps, builds dashboard,
-#    creates branches + worktrees, installs git hooks, prefetches data)
-./init.sh                    # macOS / Linux
-# or
-pwsh -File ./init.ps1        # Windows
+# 2. Bootstrap via Claude Code — there is no shell script.
+#    In Claude Code, just say "set up the project" (or run /setup).
+#    The `setup` skill at .claude/skills/setup/SKILL.md handles venv,
+#    deps, dashboard build, worktrees, and data prefetch cross-platform.
 
 # 3. Start the dashboard (binds 127.0.0.1:8787)
-.venv/bin/python app.py      # macOS / Linux
-.venv\Scripts\python.exe app.py   # Windows
+.venv/bin/python app.py                # macOS / Linux
+.venv\Scripts\python.exe app.py        # Windows
 
 # 4. Or run a single loop iteration from the terminal
 cd ../TradingBot_AutoResearch-worktrees/crypto
@@ -263,24 +262,12 @@ CAMPAIGN=crypto python ../../TradingBot_AutoResearch/loop.py --iters 1
 TradingBot_AutoResearch/
 ├── core/                       # internal modules (config, backtest_lib, diff_apply, ...)
 ├── strategies/                 # mutable strategy files + frozen markers on main
-├── scripts/                    # bootstrap.py, verify_stop_condition.py
+├── scripts/                    # verify_stop_condition.py
 ├── dashboard/                  # Vite + React + Tailwind frontend
-├── tests/                      # pytest (80 tests, run with `pytest`)
+├── tests/                      # pytest
 ├── .github/workflows/          # loop-crypto, loop-stocks, sync, scan, paper, tests
+├── .claude/skills/setup/       # AI-driven bootstrap (cross-platform)
 ├── loop.py app.py scan.py      # CLI entry points
 ├── sync_branches.py backtest.py live_trade.py
-├── configs.toml program.md     # config + LLM system prompt
-└── init.sh init.ps1            # cross-platform bootstrapper
+└── configs.toml program.md     # config + LLM system prompt
 ```
-
-### Test suite
-
-`pytest` runs 80 tests covering: config window resolution, data fetch
-raise-on-failure, basket aggregation, DSR formula, backtest
-in-process/subprocess parity, diff application (Unix + Windows newlines,
-multi-file rejection, context mismatch, full-file fallback), JSONL logger
-under concurrency, branch guard, loop smoke (mock LLM), promotion floors,
-harness sync allowlist, scan no-op, webhook payload shapes, FastAPI
-endpoints, SSE tailer (append + replay), subprocess registry start/stop,
-git hook blocking, bootstrap idempotency, workflow YAML validity,
-live-trade dry-run, dashboard build artifact.

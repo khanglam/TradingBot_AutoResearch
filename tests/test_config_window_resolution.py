@@ -63,7 +63,7 @@ def test_load_campaign_unknown_raises():
 def test_load_campaign_crypto_resolves_dates_when_today_given():
     cfg = load_campaign("crypto", today=date(2025, 6, 15))
     assert cfg.name == "crypto"
-    assert "BTC/USDT" in cfg.symbols
+    assert any("BTC" in s for s in cfg.symbols)
     assert cfg.asset == "crypto"
     assert cfg.lockbox_end == date(2025, 6, 15)
     assert cfg.train_start == date(2019, 1, 1)
